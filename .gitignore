@@ -1,0 +1,8 @@
+target/
+.m2/repository/
+render_tmp/
+deliverables/*/render/
+*.class
+*.log
+.idea/
+*.iml

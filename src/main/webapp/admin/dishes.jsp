@@ -1,0 +1,85 @@
+<%@ page import="java.util.*,com.campus.takeaway.model.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    List<Dish> dishes = (List<Dish>) request.getAttribute("dishes");
+    List<Merchant> merchants = (List<Merchant>) request.getAttribute("merchants");
+    List<Category> categories = (List<Category>) request.getAttribute("categories");
+    Dish dish = (Dish) request.getAttribute("dish");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>菜品管理</title>
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/style.css">
+</head>
+<body>
+<div class="topbar">
+    <div class="brand">外卖后台管理</div>
+    <div class="nav">
+        <a href="<%=request.getContextPath()%>/admin/dashboard">首页</a>
+        <a href="<%=request.getContextPath()%>/admin/merchants">商家管理</a>
+        <a href="<%=request.getContextPath()%>/admin/orders">订单管理</a>
+    </div>
+</div>
+<div class="container">
+    <div class="panel">
+        <h2><%=dish == null ? "新增菜品" : "编辑菜品"%></h2>
+        <form action="<%=request.getContextPath()%>/admin/dishes" method="post">
+            <input type="hidden" name="id" value="<%=dish == null ? "" : dish.getId()%>">
+            <label>所属商家</label>
+            <select name="merchantId">
+                <% for (Merchant merchant : merchants) { %>
+                <option value="<%=merchant.getId()%>" <%=dish != null && dish.getMerchantId() == merchant.getId() ? "selected" : ""%>><%=merchant.getName()%></option>
+                <% } %>
+            </select>
+            <label>菜品分类</label>
+            <select name="categoryId">
+                <% for (Category category : categories) { %>
+                <option value="<%=category.getId()%>" <%=dish != null && dish.getCategoryId() == category.getId() ? "selected" : ""%>><%=category.getName()%></option>
+                <% } %>
+            </select>
+            <label>菜品名称</label>
+            <input name="name" value="<%=dish == null ? "" : dish.getName()%>" required>
+            <label>价格</label>
+            <input name="price" type="number" step="0.01" value="<%=dish == null ? "" : dish.getPrice()%>" required>
+            <label>图片地址</label>
+            <input name="imageUrl" value="<%=dish == null ? "" : dish.getImageUrl()%>">
+            <label>描述</label>
+            <input name="description" value="<%=dish == null ? "" : dish.getDescription()%>">
+            <label>库存</label>
+            <input name="stock" type="number" value="<%=dish == null ? "0" : dish.getStock()%>" required>
+            <label>状态</label>
+            <select name="status">
+                <option value="on" <%=dish != null && "on".equals(dish.getStatus()) ? "selected" : ""%>>on</option>
+                <option value="off" <%=dish != null && "off".equals(dish.getStatus()) ? "selected" : ""%>>off</option>
+            </select>
+            <p><button class="btn" type="submit">保存</button></p>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h2>菜品列表</h2>
+        <table>
+            <tr><th>ID</th><th>名称</th><th>商家</th><th>分类</th><th>价格</th><th>库存</th><th>状态</th><th>操作</th></tr>
+            <% for (Dish item : dishes) { %>
+            <tr>
+                <td><%=item.getId()%></td>
+                <td><%=item.getName()%></td>
+                <td><%=item.getMerchantName()%></td>
+                <td><%=item.getCategoryName()%></td>
+                <td>￥<%=item.getPrice()%></td>
+                <td><%=item.getStock()%></td>
+                <td><%=item.getStatus()%></td>
+                <td>
+                    <a href="<%=request.getContextPath()%>/admin/dishes?action=edit&id=<%=item.getId()%>">编辑</a>
+                    |
+                    <a href="<%=request.getContextPath()%>/admin/dishes?action=delete&id=<%=item.getId()%>" onclick="return confirm('确认删除？')">删除</a>
+                </td>
+            </tr>
+            <% } %>
+        </table>
+    </div>
+</div>
+</body>
+</html>
