@@ -23,7 +23,7 @@ public class AddressServlet extends HttpServlet {
         address.setReceiverName(req.getParameter("receiverName"));
         address.setPhone(req.getParameter("phone"));
         address.setDetail(req.getParameter("detail"));
-        address.setDefaultAddress(false);
+        address.setDefaultAddress(addressDao.findByUserId(user.getId()).isEmpty());
         addressDao.add(address);
         resp.sendRedirect(req.getContextPath() + "/checkout");
     }

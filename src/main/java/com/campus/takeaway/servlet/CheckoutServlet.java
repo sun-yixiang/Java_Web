@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet("/checkout")
@@ -45,10 +46,29 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
         User user = (User) req.getSession().getAttribute("user");
+        String addressId = req.getParameter("addressId");
+        List<com.campus.takeaway.model.Address> addresses = addressDao.findByUserId(user.getId());
+        if (addressId == null || addressId.trim().isEmpty()) {
+            forwardCheckoutWithError(req, resp, cart, addresses, "请先新增并选择一个收货地址，再提交订单。");
+            return;
+        }
+        int parsedAddressId;
+        try {
+            parsedAddressId = Integer.parseInt(addressId);
+        } catch (NumberFormatException e) {
+            forwardCheckoutWithError(req, resp, cart, addresses, "收货地址参数不正确，请重新选择地址。");
+            return;
+        }
+        boolean addressBelongsToUser = addresses.stream().anyMatch(address -> address.getId() == parsedAddressId);
+        if (!addressBelongsToUser) {
+            forwardCheckoutWithError(req, resp, cart, addresses, "请选择当前账号下的有效收货地址。");
+            return;
+        }
+
         Order order = new Order();
         order.setOrderNo("CT" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")));
         order.setUserId(user.getId());
-        order.setAddressId(Integer.parseInt(req.getParameter("addressId")));
+        order.setAddressId(parsedAddressId);
         order.setTotalAmount(calcTotal(cart));
         order.setStatus("created");
         order.setRemark(req.getParameter("remark"));
@@ -66,5 +86,15 @@ public class CheckoutServlet extends HttpServlet {
         return cart.values().stream()
                 .map(CartItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private void forwardCheckoutWithError(HttpServletRequest req, HttpServletResponse resp, Map<Integer, CartItem> cart,
+                                          List<com.campus.takeaway.model.Address> addresses, String error)
+            throws ServletException, IOException {
+        req.setAttribute("addresses", addresses);
+        req.setAttribute("cart", cart);
+        req.setAttribute("total", calcTotal(cart));
+        req.setAttribute("checkoutError", error);
+        req.getRequestDispatcher("/checkout.jsp").forward(req, resp);
     }
 }

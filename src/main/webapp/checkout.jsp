@@ -5,6 +5,8 @@
     List<Address> addresses = (List<Address>) request.getAttribute("addresses");
     BigDecimal total = (BigDecimal) request.getAttribute("total");
     User user = (User) session.getAttribute("user");
+    boolean hasAddresses = addresses != null && !addresses.isEmpty();
+    String checkoutError = (String) request.getAttribute("checkoutError");
 %>
 <!DOCTYPE html>
 <html>
@@ -59,6 +61,13 @@
             <span>确认宿舍楼与联系电话</span>
         </div>
         <form action="<%=request.getContextPath()%>/checkout" method="post">
+            <% if (checkoutError != null) { %>
+            <div class="user-alert error"><%=checkoutError%></div>
+            <% } %>
+            <% if (!hasAddresses) { %>
+            <div class="user-alert warning">还没有收货地址。请先在下方新增地址，保存后再提交订单。</div>
+            <% } %>
+            <% if (hasAddresses) { %>
             <% for (Address address : addresses) { %>
             <p>
                 <label>
@@ -67,9 +76,14 @@
                 </label>
             </p>
             <% } %>
+            <% } %>
             <label>订单备注</label>
             <textarea name="remark" rows="3" placeholder="例如：少辣、送到宿舍楼下"></textarea>
-            <p><button class="btn" type="submit">提交订单</button></p>
+            <p>
+                <button class="btn" type="submit" <%=hasAddresses ? "" : "disabled"%>>
+                    <%=hasAddresses ? "提交订单" : "请先新增地址"%>
+                </button>
+            </p>
         </form>
     </section>
 
