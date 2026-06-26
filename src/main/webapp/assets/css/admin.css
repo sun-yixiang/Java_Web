@@ -60,8 +60,23 @@ body.admin-page::before {
     -webkit-backdrop-filter: blur(18px);
 }
 
+.admin-nav .nav-indicator {
+    position: absolute;
+    z-index: 1;
+    left: 6px;
+    top: 6px;
+    height: 38px;
+    width: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 14px 40px rgba(125, 211, 252, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    opacity: 0;
+    transition: transform 0.46s cubic-bezier(.2,.9,.2,1), width 0.46s cubic-bezier(.2,.9,.2,1), opacity 0.2s ease;
+}
+
 .admin-nav a {
     position: relative;
+    z-index: 2;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -80,8 +95,8 @@ body.admin-page::before {
 
 .admin-nav a.active {
     color: #061321;
-    background: rgba(255, 255, 255, 0.78);
-    box-shadow: 0 14px 40px rgba(125, 211, 252, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    background: transparent;
+    box-shadow: none;
 }
 
 .admin-nav a.logout-link {

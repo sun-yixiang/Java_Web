@@ -19,7 +19,8 @@
         外卖后台管理
         <small>Merchant Operations</small>
     </div>
-    <div class="admin-nav">
+    <div class="admin-nav" data-nav-slider data-nav-key="admin-nav">
+        <span class="nav-indicator"></span>
         <a href="<%=request.getContextPath()%>/admin/dashboard">首页</a>
         <a class="active" href="<%=request.getContextPath()%>/admin/merchants">商家管理</a>
         <a href="<%=request.getContextPath()%>/admin/dishes">菜品管理</a>
@@ -91,5 +92,6 @@
         </div>
     </section>
 </main>
+<script src="<%=request.getContextPath()%>/assets/js/nav-slider.js?v=20260626"></script>
 </body>
 </html>

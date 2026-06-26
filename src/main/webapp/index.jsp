@@ -16,24 +16,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>校园外卖点餐系统</title>
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/style.css?v=20260625">
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/home-glass.css?v=20260625">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/style.css?v=20260626">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/user.css?v=20260626">
 </head>
-<body class="home-glass">
-<div class="topbar">
-    <div class="brand">
+<body class="user-page">
+<div class="user-topbar">
+    <div class="user-brand">
         校园外卖点餐系统
         <small>Campus Takeaway Service</small>
     </div>
-    <div class="nav">
-        <a href="<%=request.getContextPath()%>/home">首页</a>
+    <div class="user-nav" data-nav-slider data-nav-key="student-nav">
+        <span class="nav-indicator"></span>
+        <a class="active" href="<%=request.getContextPath()%>/home">首页</a>
         <a href="<%=request.getContextPath()%>/cart">购物车</a>
+        <a href="<%=request.getContextPath()%>/checkout">去结算</a>
         <a href="<%=request.getContextPath()%>/orders">我的订单</a>
         <% if (user == null) { %>
         <a href="<%=request.getContextPath()%>/login.jsp">登录</a>
         <a href="<%=request.getContextPath()%>/register.jsp">注册</a>
         <% } else { %>
-        <span>你好，<%=user.getRealName()%></span>
+        <span class="user-name"><%=user.getRealName()%></span>
         <% if ("admin".equals(user.getRole())) { %>
         <a href="<%=request.getContextPath()%>/admin/dashboard">后台</a>
         <% } %>
@@ -42,19 +44,19 @@
     </div>
 </div>
 
-<main class="container">
-    <section class="hero">
-        <div class="hero-grid">
-            <div class="hero-copy">
+<main class="user-container">
+    <section class="user-hero">
+        <div class="user-hero-grid">
+            <div class="user-hero-copy">
                 <div>
-                    <div class="eyebrow">校内餐饮 · 即时点单 · 宿舍配送</div>
+                    <div class="user-eyebrow">校内餐饮 · 即时点单 · 宿舍配送</div>
                     <h1>让校园点餐更轻、更快、更有秩序</h1>
                     <p>
                         聚合校内商家、菜品、地址和订单管理，学生可以快速浏览菜品并下单，
-                        管理员可以维护商家、菜品和订单状态。这个版本采用毛玻璃视觉，
-                        更适合实训演示和答辩展示。
+                        管理员可以维护商家、菜品和订单状态。整体界面采用深色毛玻璃控制台风格，
+                        导航切换拥有平滑滑动反馈。
                     </p>
-                    <div class="hero-actions">
+                    <div class="user-hero-actions">
                         <a class="btn" href="#menu">开始点餐</a>
                         <a class="btn secondary" href="<%=request.getContextPath()%>/cart">查看购物车</a>
                         <% if (user == null) { %>
@@ -62,25 +64,16 @@
                         <% } %>
                     </div>
                 </div>
-                <div class="hero-metrics">
-                    <div class="metric">
-                        <strong><%=merchants.size()%></strong>
-                        <span>入驻商家</span>
-                    </div>
-                    <div class="metric">
-                        <strong><%=dishes.size()%></strong>
-                        <span>可选菜品</span>
-                    </div>
-                    <div class="metric">
-                        <strong><%=announcements.size()%></strong>
-                        <span>平台公告</span>
-                    </div>
+                <div class="user-stats">
+                    <div class="user-stat"><strong><%=merchants.size()%></strong><span>入驻商家</span></div>
+                    <div class="user-stat"><strong><%=dishes.size()%></strong><span>可选菜品</span></div>
+                    <div class="user-stat"><strong><%=announcements.size()%></strong><span>平台公告</span></div>
                 </div>
             </div>
 
-            <aside class="hero-side">
-                <div class="panel">
-                    <div class="section-title">
+            <aside class="user-side">
+                <div class="user-panel">
+                    <div class="user-section-title">
                         <h2>今晚吃点什么</h2>
                         <span>按菜品、商家或分类搜索</span>
                     </div>
@@ -89,9 +82,8 @@
                         <button class="btn" type="submit">搜索</button>
                     </form>
                 </div>
-
-                <div class="panel">
-                    <div class="section-title">
+                <div class="user-panel">
+                    <div class="user-section-title">
                         <h2>系统公告</h2>
                         <span>最新通知</span>
                     </div>
@@ -100,9 +92,8 @@
                     <p class="muted"><%=item.getContent()%></p>
                     <% } %>
                 </div>
-
-                <div class="panel">
-                    <div class="section-title">
+                <div class="user-panel">
+                    <div class="user-section-title">
                         <h2>点餐流程</h2>
                         <span>四步完成</span>
                     </div>
@@ -113,15 +104,15 @@
     </section>
 
     <section class="section">
-        <div class="section-title">
+        <div class="user-section-title">
             <h2>校园商家</h2>
             <span>校内窗口与特色小店</span>
         </div>
-        <div class="grid">
+        <div class="user-grid">
             <% for (Merchant merchant : merchants) { %>
-            <div class="card">
+            <div class="user-card">
                 <h3><%=merchant.getName()%></h3>
-                <p class="muted"><%=merchant.getDescription()%></p>
+                <p><%=merchant.getDescription()%></p>
                 <p><%=merchant.getAddress()%></p>
                 <p class="muted">电话：<%=merchant.getPhone()%> · 状态：<%=merchant.getStatus()%></p>
             </div>
@@ -130,17 +121,17 @@
     </section>
 
     <section id="menu" class="section">
-        <div class="section-title">
+        <div class="user-section-title">
             <h2>推荐菜品</h2>
             <span>从这里开始今天的晚餐</span>
         </div>
-        <div class="grid">
+        <div class="user-grid">
             <% for (Dish dish : dishes) { %>
-            <div class="card">
+            <div class="user-card">
                 <p class="muted"><%=dish.getMerchantName()%> · <%=dish.getCategoryName()%></p>
                 <h3><%=dish.getName()%></h3>
                 <p><%=dish.getDescription()%></p>
-                <div class="price">￥<%=dish.getPrice()%></div>
+                <div class="user-price">￥<%=dish.getPrice()%></div>
                 <p class="muted">库存：<%=dish.getStock()%> · 状态：<%=dish.getStatus()%></p>
                 <form action="<%=request.getContextPath()%>/cart" method="post">
                     <input type="hidden" name="action" value="add">
@@ -152,5 +143,6 @@
         </div>
     </section>
 </main>
+<script src="<%=request.getContextPath()%>/assets/js/nav-slider.js?v=20260626"></script>
 </body>
 </html>
