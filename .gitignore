@@ -1,7 +1,9 @@
 target/
 .m2/repository/
 render_tmp/
+deliverables/
 deliverables/*/render/
+docs/generated_v2/
 *.class
 *.log
 .idea/
