@@ -78,6 +78,25 @@ public class DishDao {
         return list;
     }
 
+    public List<Dish> findAvailableByMerchantId(int merchantId) {
+        String sql = "SELECT d.*, m.name merchant_name, c.name category_name FROM dishes d " +
+                "JOIN merchants m ON d.merchant_id = m.id JOIN categories c ON d.category_id = c.id " +
+                "WHERE d.merchant_id = ? AND d.status = 'on' AND m.status = 'open' ORDER BY d.id DESC";
+        List<Dish> list = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, merchantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapDish(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+
     public Dish findById(int id) {
         String sql = "SELECT d.*, m.name merchant_name, c.name category_name FROM dishes d " +
                 "JOIN merchants m ON d.merchant_id = m.id JOIN categories c ON d.category_id = c.id WHERE d.id = ?";

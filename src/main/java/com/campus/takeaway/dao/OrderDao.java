@@ -18,6 +18,8 @@ public class OrderDao {
     public int createOrder(Order order, Map<Integer, CartItem> cart) {
         String orderSql = "INSERT INTO orders(order_no, user_id, address_id, total_amount, status, remark) VALUES (?, ?, ?, ?, ?, ?)";
         String itemSql = "INSERT INTO order_items(order_id, dish_id, dish_name, price, quantity, subtotal) VALUES (?, ?, ?, ?, ?, ?)";
+        String stockSql = "UPDATE dishes d JOIN merchants m ON d.merchant_id = m.id " +
+                "SET d.stock = d.stock - ? WHERE d.id = ? AND d.stock >= ? AND d.status = 'on' AND m.status = 'open'";
         try (Connection conn = DBUtil.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement orderPs = conn.prepareStatement(orderSql, Statement.RETURN_GENERATED_KEYS)) {
@@ -35,6 +37,17 @@ public class OrderDao {
                 }
 
                 try (PreparedStatement itemPs = conn.prepareStatement(itemSql)) {
+                    try (PreparedStatement stockPs = conn.prepareStatement(stockSql)) {
+                        for (CartItem cartItem : cart.values()) {
+                            stockPs.setInt(1, cartItem.getQuantity());
+                            stockPs.setInt(2, cartItem.getDish().getId());
+                            stockPs.setInt(3, cartItem.getQuantity());
+                            int updated = stockPs.executeUpdate();
+                            if (updated == 0) {
+                                throw new IllegalStateException(cartItem.getDish().getName() + " 库存不足，请返回购物车重新确认。");
+                            }
+                        }
+                    }
                     for (CartItem cartItem : cart.values()) {
                         itemPs.setInt(1, orderId);
                         itemPs.setInt(2, cartItem.getDish().getId());

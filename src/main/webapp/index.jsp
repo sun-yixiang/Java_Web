@@ -108,14 +108,15 @@
             <h2>校园商家</h2>
             <span>校内窗口与特色小店</span>
         </div>
-        <div class="user-grid">
+        <div class="user-grid merchant-grid">
             <% for (Merchant merchant : merchants) { %>
-            <div class="user-card">
+            <a class="user-card merchant-card <%= "open".equals(merchant.getStatus()) ? "" : "is-closed" %>" href="<%=request.getContextPath()%>/merchant?id=<%=merchant.getId()%>">
                 <h3><%=merchant.getName()%></h3>
                 <p><%=merchant.getDescription()%></p>
                 <p><%=merchant.getAddress()%></p>
                 <p class="muted">电话：<%=merchant.getPhone()%> · 状态：<%=merchant.getStatus()%></p>
-            </div>
+                <span class="merchant-card-action"><%= "open".equals(merchant.getStatus()) ? "查看本店菜品" : "商家休息中" %></span>
+            </a>
             <% } %>
         </div>
     </section>
@@ -127,7 +128,7 @@
         </div>
         <div class="user-grid">
             <% for (Dish dish : dishes) { %>
-            <div class="user-card">
+            <div class="user-card dish-card <%=dish.getStock() <= 0 ? "is-sold-out" : ""%>">
                 <p class="muted"><%=dish.getMerchantName()%> · <%=dish.getCategoryName()%></p>
                 <h3><%=dish.getName()%></h3>
                 <p><%=dish.getDescription()%></p>
@@ -136,7 +137,9 @@
                 <form action="<%=request.getContextPath()%>/cart" method="post">
                     <input type="hidden" name="action" value="add">
                     <input type="hidden" name="dishId" value="<%=dish.getId()%>">
-                    <button class="btn" type="submit">加入购物车</button>
+                    <button class="btn" type="submit" <%=dish.getStock() > 0 ? "" : "disabled"%>>
+                        <%=dish.getStock() > 0 ? "加入购物车" : "已售罄"%>
+                    </button>
                 </form>
             </div>
             <% } %>

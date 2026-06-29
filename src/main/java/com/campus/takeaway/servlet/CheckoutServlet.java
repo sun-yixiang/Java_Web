@@ -4,6 +4,7 @@ import com.campus.takeaway.dao.AddressDao;
 import com.campus.takeaway.dao.DishDao;
 import com.campus.takeaway.dao.OrderDao;
 import com.campus.takeaway.model.CartItem;
+import com.campus.takeaway.model.Dish;
 import com.campus.takeaway.model.Order;
 import com.campus.takeaway.model.User;
 
@@ -33,11 +34,17 @@ public class CheckoutServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/cart");
             return;
         }
+        String stockMessage = syncCartWithStock(cart);
+        if (stockMessage != null) {
+            req.getSession().setAttribute("cartMessage", stockMessage);
+            resp.sendRedirect(req.getContextPath() + "/cart");
+            return;
+        }
+
         User user = (User) req.getSession().getAttribute("user");
-        BigDecimal total = calcTotal(cart);
         req.setAttribute("addresses", addressDao.findByUserId(user.getId()));
         req.setAttribute("cart", cart);
-        req.setAttribute("total", total);
+        req.setAttribute("total", calcTotal(cart));
         req.getRequestDispatcher("/checkout.jsp").forward(req, resp);
     }
 
@@ -48,6 +55,13 @@ public class CheckoutServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/cart");
             return;
         }
+        String stockMessage = syncCartWithStock(cart);
+        if (stockMessage != null) {
+            req.getSession().setAttribute("cartMessage", stockMessage + "请确认后再提交订单。");
+            resp.sendRedirect(req.getContextPath() + "/cart");
+            return;
+        }
+
         User user = (User) req.getSession().getAttribute("user");
         String addressId = req.getParameter("addressId");
         List<com.campus.takeaway.model.Address> addresses = addressDao.findByUserId(user.getId());
@@ -55,6 +69,7 @@ public class CheckoutServlet extends HttpServlet {
             forwardCheckoutWithError(req, resp, cart, addresses, "请先新增并选择一个收货地址，再提交订单。");
             return;
         }
+
         int parsedAddressId;
         try {
             parsedAddressId = Integer.parseInt(addressId);
@@ -62,22 +77,10 @@ public class CheckoutServlet extends HttpServlet {
             forwardCheckoutWithError(req, resp, cart, addresses, "收货地址参数不正确，请重新选择地址。");
             return;
         }
+
         boolean addressBelongsToUser = addresses.stream().anyMatch(address -> address.getId() == parsedAddressId);
         if (!addressBelongsToUser) {
             forwardCheckoutWithError(req, resp, cart, addresses, "请选择当前账号下的有效收货地址。");
-            return;
-        }
-
-        boolean hasUnavailableItem = false;
-        for (Integer dishId : new ArrayList<>(cart.keySet())) {
-            if (dishDao.findAvailableById(dishId) == null) {
-                cart.remove(dishId);
-                hasUnavailableItem = true;
-            }
-        }
-        if (hasUnavailableItem) {
-            req.getSession().setAttribute("cartMessage", "购物车中有菜品已下架或商家已关闭，已自动移除，请确认后再提交订单。");
-            resp.sendRedirect(req.getContextPath() + "/cart");
             return;
         }
 
@@ -88,7 +91,13 @@ public class CheckoutServlet extends HttpServlet {
         order.setTotalAmount(calcTotal(cart));
         order.setStatus("created");
         order.setRemark(req.getParameter("remark"));
-        orderDao.createOrder(order, cart);
+        try {
+            orderDao.createOrder(order, cart);
+        } catch (IllegalStateException e) {
+            req.getSession().setAttribute("cartMessage", e.getMessage());
+            resp.sendRedirect(req.getContextPath() + "/cart");
+            return;
+        }
         cart.clear();
         resp.sendRedirect(req.getContextPath() + "/orders");
     }
@@ -112,5 +121,31 @@ public class CheckoutServlet extends HttpServlet {
         req.setAttribute("total", calcTotal(cart));
         req.setAttribute("checkoutError", error);
         req.getRequestDispatcher("/checkout.jsp").forward(req, resp);
+    }
+
+    private String syncCartWithStock(Map<Integer, CartItem> cart) {
+        boolean removedUnavailableItem = false;
+        boolean adjustedQuantity = false;
+        for (Integer dishId : new ArrayList<>(cart.keySet())) {
+            Dish latestDish = dishDao.findAvailableById(dishId);
+            CartItem item = cart.get(dishId);
+            if (latestDish == null || latestDish.getStock() <= 0) {
+                cart.remove(dishId);
+                removedUnavailableItem = true;
+            } else {
+                item.setDish(latestDish);
+                if (item.getQuantity() > latestDish.getStock()) {
+                    item.setQuantity(latestDish.getStock());
+                    adjustedQuantity = true;
+                }
+            }
+        }
+        if (removedUnavailableItem) {
+            return "购物车中有菜品已下架、售罄或商家已关闭，已自动移除。";
+        }
+        if (adjustedQuantity) {
+            return "部分菜品数量超过当前库存，已自动调整为最大可购买数量。";
+        }
+        return null;
     }
 }

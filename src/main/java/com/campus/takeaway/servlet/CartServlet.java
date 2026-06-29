@@ -27,16 +27,12 @@ public class CartServlet extends HttpServlet {
             req.setAttribute("cartMessage", cartMessage);
             req.getSession().removeAttribute("cartMessage");
         }
-        boolean removedUnavailableItem = false;
-        for (Integer dishId : new ArrayList<>(cart.keySet())) {
-            if (dishDao.findAvailableById(dishId) == null) {
-                cart.remove(dishId);
-                removedUnavailableItem = true;
-            }
+
+        String syncMessage = syncCartWithStock(cart);
+        if (syncMessage != null) {
+            req.setAttribute("cartMessage", syncMessage);
         }
-        if (removedUnavailableItem) {
-            req.setAttribute("cartMessage", "购物车中有菜品已下架或商家已关闭，已自动移除。");
-        }
+
         BigDecimal total = cart.values().stream()
                 .map(CartItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -52,29 +48,90 @@ public class CartServlet extends HttpServlet {
         Map<Integer, CartItem> cart = getCart(req);
 
         if ("add".equals(action)) {
-            Dish dish = dishDao.findAvailableById(dishId);
-            if (dish == null) {
-                req.getSession().setAttribute("cartMessage", "该菜品已下架或商家已关闭，暂时不能加入购物车。");
-                resp.sendRedirect(req.getContextPath() + "/cart");
-                return;
-            }
-            CartItem item = cart.get(dishId);
-            if (item == null) {
-                cart.put(dishId, new CartItem(dish, 1));
-            } else {
-                item.setQuantity(item.getQuantity() + 1);
-            }
+            addItem(req, resp, cart, dishId);
+            return;
         } else if ("update".equals(action)) {
-            int quantity = Integer.parseInt(req.getParameter("quantity"));
-            if (quantity <= 0) {
-                cart.remove(dishId);
-            } else if (cart.containsKey(dishId)) {
-                cart.get(dishId).setQuantity(quantity);
-            }
+            updateItem(req, cart, dishId);
         } else if ("delete".equals(action)) {
             cart.remove(dishId);
         }
         resp.sendRedirect(req.getContextPath() + "/cart");
+    }
+
+    private void addItem(HttpServletRequest req, HttpServletResponse resp, Map<Integer, CartItem> cart, int dishId)
+            throws IOException {
+        Dish dish = dishDao.findAvailableById(dishId);
+        if (dish == null || dish.getStock() <= 0) {
+            req.getSession().setAttribute("cartMessage", "该菜品已下架、售罄或商家已关闭，暂时不能加入购物车。");
+            resp.sendRedirect(req.getContextPath() + "/cart");
+            return;
+        }
+
+        CartItem item = cart.get(dishId);
+        if (item == null) {
+            cart.put(dishId, new CartItem(dish, 1));
+        } else if (item.getQuantity() >= dish.getStock()) {
+            item.setDish(dish);
+            item.setQuantity(dish.getStock());
+            req.getSession().setAttribute("cartMessage", "该菜品库存只有 " + dish.getStock() + " 份，不能继续增加。");
+        } else {
+            item.setDish(dish);
+            item.setQuantity(item.getQuantity() + 1);
+        }
+        resp.sendRedirect(req.getContextPath() + "/cart");
+    }
+
+    private void updateItem(HttpServletRequest req, Map<Integer, CartItem> cart, int dishId) {
+        int quantity = Integer.parseInt(req.getParameter("quantity"));
+        if (quantity <= 0) {
+            cart.remove(dishId);
+            return;
+        }
+        if (!cart.containsKey(dishId)) {
+            return;
+        }
+
+        Dish dish = dishDao.findAvailableById(dishId);
+        if (dish == null || dish.getStock() <= 0) {
+            cart.remove(dishId);
+            req.getSession().setAttribute("cartMessage", "该菜品已下架、售罄或商家已关闭，已从购物车移除。");
+            return;
+        }
+
+        CartItem item = cart.get(dishId);
+        item.setDish(dish);
+        if (quantity > dish.getStock()) {
+            item.setQuantity(dish.getStock());
+            req.getSession().setAttribute("cartMessage", "该菜品库存只有 " + dish.getStock() + " 份，已为你调整到最大可购买数量。");
+        } else {
+            item.setQuantity(quantity);
+        }
+    }
+
+    private String syncCartWithStock(Map<Integer, CartItem> cart) {
+        boolean removedUnavailableItem = false;
+        boolean adjustedQuantity = false;
+        for (Integer dishId : new ArrayList<>(cart.keySet())) {
+            Dish latestDish = dishDao.findAvailableById(dishId);
+            CartItem item = cart.get(dishId);
+            if (latestDish == null || latestDish.getStock() <= 0) {
+                cart.remove(dishId);
+                removedUnavailableItem = true;
+            } else {
+                item.setDish(latestDish);
+                if (item.getQuantity() > latestDish.getStock()) {
+                    item.setQuantity(latestDish.getStock());
+                    adjustedQuantity = true;
+                }
+            }
+        }
+        if (removedUnavailableItem) {
+            return "购物车中有菜品已下架、售罄或商家已关闭，已自动移除。";
+        }
+        if (adjustedQuantity) {
+            return "部分菜品数量超过当前库存，已自动调整为最大可购买数量。";
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")

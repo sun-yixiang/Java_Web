@@ -40,17 +40,18 @@
         <% } %>
         <div class="user-table-wrap">
             <table>
-                <tr><th>菜品</th><th>商家</th><th>单价</th><th>数量</th><th>小计</th><th>操作</th></tr>
+                <tr><th>菜品</th><th>商家</th><th>单价</th><th>库存</th><th>数量</th><th>小计</th><th>操作</th></tr>
                 <% for (CartItem item : cart.values()) { %>
                 <tr>
                     <td><%=item.getDish().getName()%></td>
                     <td><%=item.getDish().getMerchantName()%></td>
                     <td>￥<%=item.getDish().getPrice()%></td>
+                    <td><%=item.getDish().getStock()%></td>
                     <td>
                         <form class="form-inline" action="<%=request.getContextPath()%>/cart" method="post">
                             <input type="hidden" name="action" value="update">
                             <input type="hidden" name="dishId" value="<%=item.getDish().getId()%>">
-                            <input type="number" name="quantity" min="0" value="<%=item.getQuantity()%>">
+                            <input type="number" name="quantity" min="0" max="<%=item.getDish().getStock()%>" value="<%=item.getQuantity()%>">
                             <button class="btn secondary" type="submit">修改</button>
                         </form>
                     </td>
