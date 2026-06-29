@@ -37,8 +37,9 @@
 ## 运行步骤
 
 1. 创建数据库并导入 `db/campus_takeaway.sql`
-2. 修改 `src/main/resources/db.properties` 中的 MySQL 用户名和密码
-3. 在项目根目录执行：
+2. 如果需要给已有数据库追加更多演示商家和菜品，继续导入 `db/seed_more_data.sql`
+3. 修改 `src/main/resources/db.properties` 中的 MySQL 用户名和密码
+4. 在项目根目录执行：
 
 ```bash
 mvn clean package
@@ -50,8 +51,8 @@ mvn clean package
 mvn -s .mvn/settings.xml clean package
 ```
 
-4. 将 `target/campus-takeaway.war` 部署到 Tomcat 9
-5. 浏览器访问：
+5. 将 `target/campus-takeaway.war` 部署到 Tomcat 9
+6. 浏览器访问：
 
 ```text
 http://localhost:8080/campus-takeaway/home
