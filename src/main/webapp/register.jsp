@@ -37,7 +37,7 @@
             <label>姓名</label>
             <input name="realName" required>
             <label>手机号</label>
-            <input name="phone">
+            <input name="phone" type="tel" pattern="1[3-9][0-9]{9}" maxlength="11" placeholder="请输入 11 位手机号" required>
             <p><button class="btn" type="submit">注册</button></p>
         </form>
         <p><a href="<%=request.getContextPath()%>/login.jsp">已有账号？去登录</a></p>

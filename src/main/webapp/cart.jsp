@@ -4,6 +4,7 @@
     Map<Integer, CartItem> cart = (Map<Integer, CartItem>) request.getAttribute("cart");
     BigDecimal total = (BigDecimal) request.getAttribute("total");
     User user = (User) session.getAttribute("user");
+    String cartMessage = (String) request.getAttribute("cartMessage");
 %>
 <!DOCTYPE html>
 <html>
@@ -34,6 +35,9 @@
             <h2>我的购物车</h2>
             <span>确认菜品数量和金额</span>
         </div>
+        <% if (cartMessage != null) { %>
+        <div class="user-alert warning"><%=cartMessage%></div>
+        <% } %>
         <div class="user-table-wrap">
             <table>
                 <tr><th>菜品</th><th>商家</th><th>单价</th><th>数量</th><th>小计</th><th>操作</th></tr>

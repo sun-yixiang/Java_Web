@@ -44,9 +44,61 @@ public class DishDao {
         return list;
     }
 
+    public List<Dish> findAvailable(String keyword) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT d.*, m.name merchant_name, c.name category_name ");
+        sql.append("FROM dishes d ");
+        sql.append("JOIN merchants m ON d.merchant_id = m.id ");
+        sql.append("JOIN categories c ON d.category_id = c.id ");
+        sql.append("WHERE d.status = 'on' AND m.status = 'open' ");
+        List<Object> params = new ArrayList<>();
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (d.name LIKE ? OR m.name LIKE ? OR c.name LIKE ?) ");
+            String like = "%" + keyword.trim() + "%";
+            params.add(like);
+            params.add(like);
+            params.add(like);
+        }
+        sql.append("ORDER BY d.id DESC");
+
+        List<Dish> list = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapDish(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+
     public Dish findById(int id) {
         String sql = "SELECT d.*, m.name merchant_name, c.name category_name FROM dishes d " +
                 "JOIN merchants m ON d.merchant_id = m.id JOIN categories c ON d.category_id = c.id WHERE d.id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapDish(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public Dish findAvailableById(int id) {
+        String sql = "SELECT d.*, m.name merchant_name, c.name category_name FROM dishes d " +
+                "JOIN merchants m ON d.merchant_id = m.id JOIN categories c ON d.category_id = c.id " +
+                "WHERE d.id = ? AND d.status = 'on' AND m.status = 'open'";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);

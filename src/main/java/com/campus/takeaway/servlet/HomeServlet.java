@@ -20,7 +20,7 @@ public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String keyword = req.getParameter("keyword");
-        req.setAttribute("dishes", dishDao.findAll(keyword));
+        req.setAttribute("dishes", dishDao.findAvailable(keyword));
         req.setAttribute("merchants", merchantDao.findAll());
         req.setAttribute("announcements", announcementDao.findLatest());
         req.getRequestDispatcher("/index.jsp").forward(req, resp);

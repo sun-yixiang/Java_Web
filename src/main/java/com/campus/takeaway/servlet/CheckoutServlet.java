@@ -1,6 +1,7 @@
 package com.campus.takeaway.servlet;
 
 import com.campus.takeaway.dao.AddressDao;
+import com.campus.takeaway.dao.DishDao;
 import com.campus.takeaway.dao.OrderDao;
 import com.campus.takeaway.model.CartItem;
 import com.campus.takeaway.model.Order;
@@ -15,12 +16,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
     private final AddressDao addressDao = new AddressDao();
+    private final DishDao dishDao = new DishDao();
     private final OrderDao orderDao = new OrderDao();
 
     @Override
@@ -62,6 +65,19 @@ public class CheckoutServlet extends HttpServlet {
         boolean addressBelongsToUser = addresses.stream().anyMatch(address -> address.getId() == parsedAddressId);
         if (!addressBelongsToUser) {
             forwardCheckoutWithError(req, resp, cart, addresses, "请选择当前账号下的有效收货地址。");
+            return;
+        }
+
+        boolean hasUnavailableItem = false;
+        for (Integer dishId : new ArrayList<>(cart.keySet())) {
+            if (dishDao.findAvailableById(dishId) == null) {
+                cart.remove(dishId);
+                hasUnavailableItem = true;
+            }
+        }
+        if (hasUnavailableItem) {
+            req.getSession().setAttribute("cartMessage", "购物车中有菜品已下架或商家已关闭，已自动移除，请确认后再提交订单。");
+            resp.sendRedirect(req.getContextPath() + "/cart");
             return;
         }
 

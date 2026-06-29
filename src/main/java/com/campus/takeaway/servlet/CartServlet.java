@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -21,6 +22,21 @@ public class CartServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<Integer, CartItem> cart = getCart(req);
+        Object cartMessage = req.getSession().getAttribute("cartMessage");
+        if (cartMessage != null) {
+            req.setAttribute("cartMessage", cartMessage);
+            req.getSession().removeAttribute("cartMessage");
+        }
+        boolean removedUnavailableItem = false;
+        for (Integer dishId : new ArrayList<>(cart.keySet())) {
+            if (dishDao.findAvailableById(dishId) == null) {
+                cart.remove(dishId);
+                removedUnavailableItem = true;
+            }
+        }
+        if (removedUnavailableItem) {
+            req.setAttribute("cartMessage", "购物车中有菜品已下架或商家已关闭，已自动移除。");
+        }
         BigDecimal total = cart.values().stream()
                 .map(CartItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -36,7 +52,12 @@ public class CartServlet extends HttpServlet {
         Map<Integer, CartItem> cart = getCart(req);
 
         if ("add".equals(action)) {
-            Dish dish = dishDao.findById(dishId);
+            Dish dish = dishDao.findAvailableById(dishId);
+            if (dish == null) {
+                req.getSession().setAttribute("cartMessage", "该菜品已下架或商家已关闭，暂时不能加入购物车。");
+                resp.sendRedirect(req.getContextPath() + "/cart");
+                return;
+            }
             CartItem item = cart.get(dishId);
             if (item == null) {
                 cart.put(dishId, new CartItem(dish, 1));
@@ -47,7 +68,7 @@ public class CartServlet extends HttpServlet {
             int quantity = Integer.parseInt(req.getParameter("quantity"));
             if (quantity <= 0) {
                 cart.remove(dishId);
-            } else {
+            } else if (cart.containsKey(dishId)) {
                 cart.get(dishId).setQuantity(quantity);
             }
         } else if ("delete".equals(action)) {
