@@ -1,8 +1,9 @@
-<%@ page import="java.util.*,com.campus.takeaway.model.*,com.campus.takeaway.util.StatusText" %>
+<%@ page import="java.util.*,java.text.SimpleDateFormat,com.campus.takeaway.model.*,com.campus.takeaway.util.StatusText" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     List<Order> orders = (List<Order>) request.getAttribute("orders");
     User user = (User) session.getAttribute("user");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 %>
 <!DOCTYPE html>
 <html>
@@ -43,7 +44,7 @@
                     <td><%=StatusText.order(order.getStatus())%></td>
                     <td><%=order.getAddressDetail()%></td>
                     <td><%=order.getRemark() == null ? "" : order.getRemark()%></td>
-                    <td><%=order.getCreatedAt()%></td>
+                    <td><%=order.getCreatedAt() == null ? "" : dateFormat.format(order.getCreatedAt())%></td>
                 </tr>
                 <% } %>
             </table>
