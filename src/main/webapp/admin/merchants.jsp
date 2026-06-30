@@ -1,4 +1,4 @@
-<%@ page import="java.util.*,com.campus.takeaway.model.*" %>
+<%@ page import="java.util.*,com.campus.takeaway.model.*,com.campus.takeaway.util.StatusText" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     List<Merchant> merchants = (List<Merchant>) request.getAttribute("merchants");
@@ -17,7 +17,7 @@
 <div class="admin-topbar">
     <div class="admin-brand">
         外卖后台管理
-        <small>Merchant Operations</small>
+        <small>商家运营管理</small>
     </div>
     <div class="admin-nav" data-nav-slider data-nav-key="admin-nav">
         <span class="nav-indicator"></span>
@@ -57,8 +57,8 @@
                 <div>
                     <label>营业状态</label>
                     <select name="status">
-                        <option value="open" <%=merchant != null && "open".equals(merchant.getStatus()) ? "selected" : ""%>>open</option>
-                        <option value="closed" <%=merchant != null && "closed".equals(merchant.getStatus()) ? "selected" : ""%>>closed</option>
+                        <option value="open" <%=merchant != null && "open".equals(merchant.getStatus()) ? "selected" : ""%>>营业中</option>
+                        <option value="closed" <%=merchant != null && "closed".equals(merchant.getStatus()) ? "selected" : ""%>>已关闭</option>
                     </select>
                 </div>
             </div>
@@ -80,7 +80,7 @@
                     <td><%=item.getName()%></td>
                     <td><%=item.getPhone()%></td>
                     <td><%=item.getAddress()%></td>
-                    <td><span class="admin-badge admin-status-<%=item.getStatus()%>"><%=item.getStatus()%></span></td>
+                    <td><span class="admin-badge admin-status-<%=item.getStatus()%>"><%=StatusText.merchant(item.getStatus())%></span></td>
                     <td>
                         <a href="<%=request.getContextPath()%>/admin/merchants?action=edit&id=<%=item.getId()%>">编辑</a>
                         |

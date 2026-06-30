@@ -12,7 +12,7 @@
 <div class="admin-topbar">
     <div class="admin-brand">
         外卖后台管理
-        <small>Campus Takeaway Console</small>
+        <small>校园外卖运营控制台</small>
     </div>
     <div class="admin-nav" data-nav-slider data-nav-key="admin-nav">
         <span class="nav-indicator"></span>
@@ -80,7 +80,7 @@
             </div>
             <div class="card">
                 <h3>订单状态流转</h3>
-                <p class="muted">订单建议按 created、paid、delivering、finished 的顺序维护，异常订单及时取消。</p>
+                <p class="muted">订单建议按“待处理、已支付、配送中、已完成”的顺序维护，异常订单及时取消。</p>
             </div>
             <div class="card">
                 <h3>演示答辩路线</h3>

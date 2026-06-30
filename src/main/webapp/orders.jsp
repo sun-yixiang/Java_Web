@@ -1,4 +1,4 @@
-<%@ page import="java.util.*,com.campus.takeaway.model.*" %>
+<%@ page import="java.util.*,com.campus.takeaway.model.*,com.campus.takeaway.util.StatusText" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     List<Order> orders = (List<Order>) request.getAttribute("orders");
@@ -15,7 +15,7 @@
 </head>
 <body class="user-page">
 <div class="user-topbar">
-    <div class="user-brand">校园外卖点餐系统<small>My Orders</small></div>
+    <div class="user-brand">校园外卖点餐系统<small>我的订单</small></div>
     <div class="user-nav" data-nav-slider data-nav-key="student-nav">
         <span class="nav-indicator"></span>
         <a href="<%=request.getContextPath()%>/home">首页</a>
@@ -40,7 +40,7 @@
                 <tr>
                     <td><%=order.getOrderNo()%></td>
                     <td>￥<%=order.getTotalAmount()%></td>
-                    <td><%=order.getStatus()%></td>
+                    <td><%=StatusText.order(order.getStatus())%></td>
                     <td><%=order.getAddressDetail()%></td>
                     <td><%=order.getRemark() == null ? "" : order.getRemark()%></td>
                     <td><%=order.getCreatedAt()%></td>

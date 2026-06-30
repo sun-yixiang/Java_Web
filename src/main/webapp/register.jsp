@@ -10,7 +10,7 @@
 </head>
 <body class="user-page">
 <div class="user-topbar">
-    <div class="user-brand">校园外卖点餐系统<small>Create Account</small></div>
+    <div class="user-brand">校园外卖点餐系统<small>创建账号</small></div>
     <div class="user-nav" data-nav-slider data-nav-key="student-nav">
         <span class="nav-indicator"></span>
         <a href="<%=request.getContextPath()%>/home">首页</a>

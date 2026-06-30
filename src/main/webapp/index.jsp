@@ -1,4 +1,4 @@
-<%@ page import="java.util.*,com.campus.takeaway.model.*" %>
+<%@ page import="java.util.*,com.campus.takeaway.model.*,com.campus.takeaway.util.StatusText" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     List<Dish> dishes = (List<Dish>) request.getAttribute("dishes");
@@ -23,7 +23,7 @@
 <div class="user-topbar">
     <div class="user-brand">
         校园外卖点餐系统
-        <small>Campus Takeaway Service</small>
+        <small>校园外卖点餐服务</small>
     </div>
     <div class="user-nav" data-nav-slider data-nav-key="student-nav">
         <span class="nav-indicator"></span>
@@ -114,7 +114,7 @@
                 <h3><%=merchant.getName()%></h3>
                 <p><%=merchant.getDescription()%></p>
                 <p><%=merchant.getAddress()%></p>
-                <p class="muted">电话：<%=merchant.getPhone()%> · 状态：<%=merchant.getStatus()%></p>
+                <p class="muted">电话：<%=merchant.getPhone()%> · 状态：<%=StatusText.merchant(merchant.getStatus())%></p>
                 <span class="merchant-card-action"><%= "open".equals(merchant.getStatus()) ? "查看本店菜品" : "商家休息中" %></span>
             </a>
             <% } %>
@@ -133,7 +133,7 @@
                 <h3><%=dish.getName()%></h3>
                 <p><%=dish.getDescription()%></p>
                 <div class="user-price">￥<%=dish.getPrice()%></div>
-                <p class="muted">库存：<%=dish.getStock()%> · 状态：<%=dish.getStatus()%></p>
+                <p class="muted">库存：<%=dish.getStock()%> · 状态：<%=StatusText.dish(dish.getStatus())%></p>
                 <form action="<%=request.getContextPath()%>/cart" method="post">
                     <input type="hidden" name="action" value="add">
                     <input type="hidden" name="dishId" value="<%=dish.getId()%>">

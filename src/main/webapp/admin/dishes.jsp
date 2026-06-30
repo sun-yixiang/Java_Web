@@ -1,4 +1,4 @@
-<%@ page import="java.util.*,com.campus.takeaway.model.*" %>
+<%@ page import="java.util.*,com.campus.takeaway.model.*,com.campus.takeaway.util.StatusText" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     List<Dish> dishes = (List<Dish>) request.getAttribute("dishes");
@@ -19,7 +19,7 @@
 <div class="admin-topbar">
     <div class="admin-brand">
         外卖后台管理
-        <small>Dish Catalog</small>
+        <small>菜品目录维护</small>
     </div>
     <div class="admin-nav" data-nav-slider data-nav-key="admin-nav">
         <span class="nav-indicator"></span>
@@ -71,8 +71,8 @@
                 <div>
                     <label>状态</label>
                     <select name="status">
-                        <option value="on" <%=dish != null && "on".equals(dish.getStatus()) ? "selected" : ""%>>on</option>
-                        <option value="off" <%=dish != null && "off".equals(dish.getStatus()) ? "selected" : ""%>>off</option>
+                        <option value="on" <%=dish != null && "on".equals(dish.getStatus()) ? "selected" : ""%>>已上架</option>
+                        <option value="off" <%=dish != null && "off".equals(dish.getStatus()) ? "selected" : ""%>>已下架</option>
                     </select>
                 </div>
                 <div class="full">
@@ -104,7 +104,7 @@
                     <td><%=item.getCategoryName()%></td>
                     <td>￥<%=item.getPrice()%></td>
                     <td><%=item.getStock()%></td>
-                    <td><span class="admin-badge admin-status-<%=item.getStatus()%>"><%=item.getStatus()%></span></td>
+                    <td><span class="admin-badge admin-status-<%=item.getStatus()%>"><%=StatusText.dish(item.getStatus())%></span></td>
                     <td>
                         <a href="<%=request.getContextPath()%>/admin/dishes?action=edit&id=<%=item.getId()%>">编辑</a>
                         |

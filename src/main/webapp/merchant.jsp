@@ -23,7 +23,7 @@
 <div class="user-topbar">
     <div class="user-brand">
         校园外卖点餐系统
-        <small>Merchant Menu</small>
+        <small>商家菜单</small>
     </div>
     <div class="user-nav" data-nav-slider data-nav-key="student-nav">
         <span class="nav-indicator"></span>

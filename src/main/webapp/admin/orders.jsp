@@ -1,4 +1,4 @@
-<%@ page import="java.util.*,com.campus.takeaway.model.*" %>
+<%@ page import="java.util.*,com.campus.takeaway.model.*,com.campus.takeaway.util.StatusText" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     List<Order> orders = (List<Order>) request.getAttribute("orders");
@@ -16,7 +16,7 @@
 <div class="admin-topbar">
     <div class="admin-brand">
         外卖后台管理
-        <small>Order Dispatch</small>
+        <small>订单调度管理</small>
     </div>
     <div class="admin-nav" data-nav-slider data-nav-key="admin-nav">
         <span class="nav-indicator"></span>
@@ -43,17 +43,17 @@
                     <td><%=order.getUserName()%></td>
                     <td>￥<%=order.getTotalAmount()%></td>
                     <td><%=order.getAddressDetail()%></td>
-                    <td><span class="admin-badge admin-status-<%=order.getStatus()%>"><%=order.getStatus()%></span></td>
+                    <td><span class="admin-badge admin-status-<%=order.getStatus()%>"><%=StatusText.order(order.getStatus())%></span></td>
                     <td><%=order.getRemark() == null ? "" : order.getRemark()%></td>
                     <td>
                         <form class="form-inline" action="<%=request.getContextPath()%>/admin/orders" method="post">
                             <input type="hidden" name="id" value="<%=order.getId()%>">
                             <select name="status">
-                                <option value="created" <%= "created".equals(order.getStatus()) ? "selected" : ""%>>created</option>
-                                <option value="paid" <%= "paid".equals(order.getStatus()) ? "selected" : ""%>>paid</option>
-                                <option value="delivering" <%= "delivering".equals(order.getStatus()) ? "selected" : ""%>>delivering</option>
-                                <option value="finished" <%= "finished".equals(order.getStatus()) ? "selected" : ""%>>finished</option>
-                                <option value="cancelled" <%= "cancelled".equals(order.getStatus()) ? "selected" : ""%>>cancelled</option>
+                                <option value="created" <%= "created".equals(order.getStatus()) ? "selected" : ""%>>待处理</option>
+                                <option value="paid" <%= "paid".equals(order.getStatus()) ? "selected" : ""%>>已支付</option>
+                                <option value="delivering" <%= "delivering".equals(order.getStatus()) ? "selected" : ""%>>配送中</option>
+                                <option value="finished" <%= "finished".equals(order.getStatus()) ? "selected" : ""%>>已完成</option>
+                                <option value="cancelled" <%= "cancelled".equals(order.getStatus()) ? "selected" : ""%>>已取消</option>
                             </select>
                             <button class="btn" type="submit">更新</button>
                         </form>
