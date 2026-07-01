@@ -1,8 +1,8 @@
 package com.campus.takeaway.servlet;
 
-import com.campus.takeaway.dao.DishDao;
 import com.campus.takeaway.dao.MerchantDao;
 import com.campus.takeaway.dao.OrderDao;
+import com.campus.takeaway.dao.UserDao;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,13 +14,13 @@ import java.io.IOException;
 @WebServlet("/admin/dashboard")
 public class AdminDashboardServlet extends HttpServlet {
     private final MerchantDao merchantDao = new MerchantDao();
-    private final DishDao dishDao = new DishDao();
     private final OrderDao orderDao = new OrderDao();
+    private final UserDao userDao = new UserDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("merchantCount", merchantDao.findAll().size());
-        req.setAttribute("dishCount", dishDao.findAll(null).size());
+        req.setAttribute("userCount", userDao.findAll().size());
         req.setAttribute("orderCount", orderDao.findAll().size());
         req.getRequestDispatcher("/admin/dashboard.jsp").forward(req, resp);
     }

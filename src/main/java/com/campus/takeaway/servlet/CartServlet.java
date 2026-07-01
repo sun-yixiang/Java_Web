@@ -69,6 +69,12 @@ public class CartServlet extends HttpServlet {
 
         CartItem item = cart.get(dishId);
         if (item == null) {
+            if (!cart.isEmpty() && cart.values().stream()
+                    .anyMatch(cartItem -> cartItem.getDish().getMerchantId() != dish.getMerchantId())) {
+                req.getSession().setAttribute("cartMessage", "一次订单只能选择同一家商家的菜品，请先结算或清空购物车后再选择其他商家。");
+                resp.sendRedirect(req.getContextPath() + "/cart");
+                return;
+            }
             cart.put(dishId, new CartItem(dish, 1));
         } else if (item.getQuantity() >= dish.getStock()) {
             item.setDish(dish);

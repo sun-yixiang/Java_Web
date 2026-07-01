@@ -38,6 +38,8 @@
         <span class="user-name"><%=user.getRealName()%></span>
         <% if ("admin".equals(user.getRole())) { %>
         <a href="<%=request.getContextPath()%>/admin/dashboard">后台</a>
+        <% } else if ("merchant".equals(user.getRole())) { %>
+        <a href="<%=request.getContextPath()%>/merchant-admin/dashboard">商家后台</a>
         <% } %>
         <a href="<%=request.getContextPath()%>/logout">退出</a>
         <% } %>
@@ -53,7 +55,7 @@
                     <h1>让校园点餐更轻、更快、更有秩序</h1>
                     <p>
                         聚合校内商家、菜品、地址和订单管理，学生可以快速浏览菜品并下单，
-                        管理员可以维护商家、菜品和订单状态。整体界面采用深色毛玻璃控制台风格，
+                        管理员维护平台资料，商家维护本店菜品和订单。整体界面采用深色毛玻璃控制台风格，
                         导航切换拥有平滑滑动反馈。
                     </p>
                     <div class="user-hero-actions">
@@ -114,7 +116,7 @@
                 <h3><%=merchant.getName()%></h3>
                 <p><%=merchant.getDescription()%></p>
                 <p><%=merchant.getAddress()%></p>
-                <p class="muted">电话：<%=merchant.getPhone()%> · 状态：<%=StatusText.merchant(merchant.getStatus())%></p>
+                <p class="muted">评分：<%=merchant.getScore() == null ? "0.0" : merchant.getScore()%> · 电话：<%=merchant.getPhone()%> · 状态：<%=StatusText.merchant(merchant.getStatus())%></p>
                 <span class="merchant-card-action"><%= "open".equals(merchant.getStatus()) ? "查看本店菜品" : "商家休息中" %></span>
             </a>
             <% } %>
@@ -133,7 +135,7 @@
                 <h3><%=dish.getName()%></h3>
                 <p><%=dish.getDescription()%></p>
                 <div class="user-price">￥<%=dish.getPrice()%></div>
-                <p class="muted">库存：<%=dish.getStock()%> · 状态：<%=StatusText.dish(dish.getStatus())%></p>
+                <p class="muted">评分：<%=dish.getScore() == null ? "0.0" : dish.getScore()%> · 库存：<%=dish.getStock()%> · 状态：<%=StatusText.dish(dish.getStatus())%></p>
                 <form action="<%=request.getContextPath()%>/cart" method="post">
                     <input type="hidden" name="action" value="add">
                     <input type="hidden" name="dishId" value="<%=dish.getId()%>">

@@ -38,6 +38,8 @@
         <span class="user-name"><%=user.getRealName()%></span>
         <% if ("admin".equals(user.getRole())) { %>
         <a href="<%=request.getContextPath()%>/admin/dashboard">后台</a>
+        <% } else if ("merchant".equals(user.getRole())) { %>
+        <a href="<%=request.getContextPath()%>/merchant-admin/dashboard">商家后台</a>
         <% } %>
         <a href="<%=request.getContextPath()%>/logout">退出</a>
         <% } %>
@@ -53,6 +55,7 @@
             <div class="merchant-meta">
                 <span><%=merchant.getAddress()%></span>
                 <span><%=merchant.getPhone()%></span>
+                <span>评分 <%=merchant.getScore() == null ? "0.0" : merchant.getScore()%></span>
                 <span class="<%=isOpen ? "status-open" : "status-closed"%>"><%=isOpen ? "营业中" : "休息中"%></span>
             </div>
         </div>
@@ -79,7 +82,7 @@
                 <h3><%=dish.getName()%></h3>
                 <p><%=dish.getDescription()%></p>
                 <div class="user-price">￥<%=dish.getPrice()%></div>
-                <p class="muted">库存：<%=dish.getStock()%></p>
+                <p class="muted">评分：<%=dish.getScore() == null ? "0.0" : dish.getScore()%> · 库存：<%=dish.getStock()%></p>
                 <form action="<%=request.getContextPath()%>/cart" method="post">
                     <input type="hidden" name="action" value="add">
                     <input type="hidden" name="dishId" value="<%=dish.getId()%>">

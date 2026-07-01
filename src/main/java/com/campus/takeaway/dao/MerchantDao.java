@@ -7,12 +7,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MerchantDao {
     public List<Merchant> findAll() {
-        String sql = "SELECT * FROM merchants ORDER BY id DESC";
+        String sql = "SELECT * FROM merchants ORDER BY score DESC, id DESC";
         List<Merchant> list = new ArrayList<>();
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -47,7 +48,7 @@ public class MerchantDao {
             update(merchant);
             return;
         }
-        String sql = "INSERT INTO merchants(name, description, phone, address, status) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO merchants(name, description, phone, address, status, score) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setMerchantParams(ps, merchant);
@@ -69,11 +70,11 @@ public class MerchantDao {
     }
 
     private void update(Merchant merchant) {
-        String sql = "UPDATE merchants SET name=?, description=?, phone=?, address=?, status=? WHERE id=?";
+        String sql = "UPDATE merchants SET name=?, description=?, phone=?, address=?, status=?, score=? WHERE id=?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setMerchantParams(ps, merchant);
-            ps.setInt(6, merchant.getId());
+            ps.setInt(7, merchant.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -86,6 +87,7 @@ public class MerchantDao {
         ps.setString(3, merchant.getPhone());
         ps.setString(4, merchant.getAddress());
         ps.setString(5, merchant.getStatus());
+        ps.setBigDecimal(6, normalizeScore(merchant.getScore()));
     }
 
     private Merchant mapMerchant(ResultSet rs) throws SQLException {
@@ -96,6 +98,21 @@ public class MerchantDao {
         merchant.setPhone(rs.getString("phone"));
         merchant.setAddress(rs.getString("address"));
         merchant.setStatus(rs.getString("status"));
+        merchant.setScore(rs.getBigDecimal("score"));
         return merchant;
+    }
+
+    private BigDecimal normalizeScore(BigDecimal score) {
+        if (score == null) {
+            return BigDecimal.ZERO;
+        }
+        if (score.compareTo(BigDecimal.ZERO) < 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal max = new BigDecimal("5.0");
+        if (score.compareTo(max) > 0) {
+            return max;
+        }
+        return score;
     }
 }

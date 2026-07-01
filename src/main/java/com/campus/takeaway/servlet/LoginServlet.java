@@ -25,6 +25,8 @@ public class LoginServlet extends HttpServlet {
         req.getSession().setAttribute("user", user);
         if ("admin".equals(user.getRole())) {
             resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
+        } else if ("merchant".equals(user.getRole())) {
+            resp.sendRedirect(req.getContextPath() + "/merchant-admin/dashboard");
         } else {
             resp.sendRedirect(req.getContextPath() + "/");
         }

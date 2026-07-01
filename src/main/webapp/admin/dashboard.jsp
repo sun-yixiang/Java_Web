@@ -18,7 +18,7 @@
         <span class="nav-indicator"></span>
         <a class="active" href="<%=request.getContextPath()%>/admin/dashboard">首页</a>
         <a href="<%=request.getContextPath()%>/admin/merchants">商家管理</a>
-        <a href="<%=request.getContextPath()%>/admin/dishes">菜品管理</a>
+        <a href="<%=request.getContextPath()%>/admin/users">用户管理</a>
         <a href="<%=request.getContextPath()%>/admin/orders">订单管理</a>
         <a class="logout-link" href="<%=request.getContextPath()%>/logout">退出</a>
     </div>
@@ -31,20 +31,20 @@
             <h1>今天的校园餐饮，一眼掌握</h1>
             <p>
                 后台聚合商家、菜品和订单数据，管理员可以从这里快速进入维护流程。
-                当前页面已采用毛玻璃控制台风格，导航会在所有后台页面保持一致，并以浅色玻璃态标记当前模块。
+                管理员负责商家、用户和平台全部订单的管理；菜品维护和商家订单处理由商家后台负责。
             </p>
         </div>
         <div class="admin-quick-panel">
             <a class="admin-action-card" href="<%=request.getContextPath()%>/admin/merchants">
-                <span><strong>维护商家</strong>新增窗口、编辑联系电话与营业状态</span>
+                <span><strong>维护商家</strong>新增窗口、编辑联系电话、营业状态与评分</span>
                 <em>→</em>
             </a>
-            <a class="admin-action-card" href="<%=request.getContextPath()%>/admin/dishes">
-                <span><strong>更新菜品</strong>调整价格、库存、分类与上下架</span>
+            <a class="admin-action-card" href="<%=request.getContextPath()%>/admin/users">
+                <span><strong>管理用户</strong>维护学生、管理员和一对一商家账号</span>
                 <em>→</em>
             </a>
             <a class="admin-action-card" href="<%=request.getContextPath()%>/admin/orders">
-                <span><strong>处理订单</strong>查看订单并推进配送状态</span>
+                <span><strong>查看订单</strong>管理平台全部订单与整体状态</span>
                 <em>→</em>
             </a>
         </div>
@@ -56,10 +56,10 @@
             <span>商家数量</span>
             <small>覆盖校内窗口与特色店铺</small>
         </div>
-        <div class="admin-stat dish">
-            <strong><%=request.getAttribute("dishCount")%></strong>
-            <span>菜品数量</span>
-            <small>支持主食、饮品、小吃等分类</small>
+        <div class="admin-stat user">
+            <strong><%=request.getAttribute("userCount")%></strong>
+            <span>用户数量</span>
+            <small>包含学生、管理员与商家账号</small>
         </div>
         <div class="admin-stat order">
             <strong><%=request.getAttribute("orderCount")%></strong>
@@ -76,15 +76,15 @@
         <div class="grid">
             <div class="card">
                 <h3>高峰前检查</h3>
-                <p class="muted">午餐和晚餐前确认菜品库存、价格和商家营业状态，避免学生下单后无法处理。</p>
+                <p class="muted">午餐和晚餐前确认商家营业状态和评分，菜品库存由对应商家账号维护。</p>
             </div>
             <div class="card">
                 <h3>订单状态流转</h3>
-                <p class="muted">订单建议按“待处理、已支付、配送中、已完成”的顺序维护，异常订单及时取消。</p>
+                <p class="muted">平台可查看全部订单，具体商家订单由对应商家账号跟进处理。</p>
             </div>
             <div class="card">
                 <h3>演示答辩路线</h3>
-                <p class="muted">先展示首页点餐，再登录后台维护菜品，最后更新订单状态，流程最完整。</p>
+                <p class="muted">先展示首页点餐，再登录商家后台维护菜品，最后回到管理员后台查看平台订单。</p>
             </div>
         </div>
     </section>

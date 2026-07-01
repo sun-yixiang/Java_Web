@@ -14,6 +14,7 @@ public class Dish {
     private String description;
     private int stock;
     private String status;
+    private BigDecimal score;
 
     public int getId() {
         return id;
@@ -101,5 +102,13 @@ public class Dish {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public BigDecimal getScore() {
+        return score;
+    }
+
+    public void setScore(BigDecimal score) {
+        this.score = score;
     }
 }

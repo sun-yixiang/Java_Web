@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @WebServlet("/admin/merchants")
 public class AdminMerchantServlet extends HttpServlet {
@@ -40,7 +41,21 @@ public class AdminMerchantServlet extends HttpServlet {
         merchant.setPhone(req.getParameter("phone"));
         merchant.setAddress(req.getParameter("address"));
         merchant.setStatus(req.getParameter("status"));
+        merchant.setScore(parseScore(req.getParameter("score")));
         merchantDao.save(merchant);
         resp.sendRedirect(req.getContextPath() + "/admin/merchants");
+    }
+
+    private BigDecimal parseScore(String value) {
+        try {
+            BigDecimal score = new BigDecimal(value == null || value.trim().isEmpty() ? "0" : value.trim());
+            if (score.compareTo(BigDecimal.ZERO) < 0) {
+                return BigDecimal.ZERO;
+            }
+            BigDecimal max = new BigDecimal("5.0");
+            return score.compareTo(max) > 0 ? max : score;
+        } catch (NumberFormatException e) {
+            return BigDecimal.ZERO;
+        }
     }
 }

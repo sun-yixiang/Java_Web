@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class DishDao {
             params.add(like);
             params.add(like);
         }
-        sql.append("ORDER BY d.id DESC");
+        sql.append("ORDER BY d.score DESC, d.id DESC");
 
         List<Dish> list = new ArrayList<>();
         try (Connection conn = DBUtil.getConnection();
@@ -59,7 +60,7 @@ public class DishDao {
             params.add(like);
             params.add(like);
         }
-        sql.append("ORDER BY d.id DESC");
+        sql.append("ORDER BY m.score DESC, d.score DESC, d.id DESC");
 
         List<Dish> list = new ArrayList<>();
         try (Connection conn = DBUtil.getConnection();
@@ -81,11 +82,45 @@ public class DishDao {
     public List<Dish> findAvailableByMerchantId(int merchantId) {
         String sql = "SELECT d.*, m.name merchant_name, c.name category_name FROM dishes d " +
                 "JOIN merchants m ON d.merchant_id = m.id JOIN categories c ON d.category_id = c.id " +
-                "WHERE d.merchant_id = ? AND d.status = 'on' AND m.status = 'open' ORDER BY d.id DESC";
+                "WHERE d.merchant_id = ? AND d.status = 'on' AND m.status = 'open' ORDER BY d.score DESC, d.id DESC";
         List<Dish> list = new ArrayList<>();
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, merchantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapDish(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+
+    public List<Dish> findByMerchantId(int merchantId, String keyword) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT d.*, m.name merchant_name, c.name category_name ");
+        sql.append("FROM dishes d ");
+        sql.append("JOIN merchants m ON d.merchant_id = m.id ");
+        sql.append("JOIN categories c ON d.category_id = c.id ");
+        sql.append("WHERE d.merchant_id = ? ");
+        List<Object> params = new ArrayList<>();
+        params.add(merchantId);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (d.name LIKE ? OR c.name LIKE ?) ");
+            String like = "%" + keyword.trim() + "%";
+            params.add(like);
+            params.add(like);
+        }
+        sql.append("ORDER BY d.score DESC, d.id DESC");
+
+        List<Dish> list = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapDish(rs));
@@ -137,7 +172,7 @@ public class DishDao {
             update(dish);
             return;
         }
-        String sql = "INSERT INTO dishes(merchant_id, category_id, name, price, image_url, description, stock, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dishes(merchant_id, category_id, name, price, image_url, description, stock, status, score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setDishParams(ps, dish);
@@ -158,12 +193,24 @@ public class DishDao {
         }
     }
 
+    public void deleteByMerchantId(int id, int merchantId) {
+        String sql = "DELETE FROM dishes WHERE id = ? AND merchant_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.setInt(2, merchantId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void update(Dish dish) {
-        String sql = "UPDATE dishes SET merchant_id=?, category_id=?, name=?, price=?, image_url=?, description=?, stock=?, status=? WHERE id=?";
+        String sql = "UPDATE dishes SET merchant_id=?, category_id=?, name=?, price=?, image_url=?, description=?, stock=?, status=?, score=? WHERE id=?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             setDishParams(ps, dish);
-            ps.setInt(9, dish.getId());
+            ps.setInt(10, dish.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -179,6 +226,7 @@ public class DishDao {
         ps.setString(6, dish.getDescription());
         ps.setInt(7, dish.getStock());
         ps.setString(8, dish.getStatus());
+        ps.setBigDecimal(9, normalizeScore(dish.getScore()));
     }
 
     private Dish mapDish(ResultSet rs) throws SQLException {
@@ -194,6 +242,21 @@ public class DishDao {
         dish.setDescription(rs.getString("description"));
         dish.setStock(rs.getInt("stock"));
         dish.setStatus(rs.getString("status"));
+        dish.setScore(rs.getBigDecimal("score"));
         return dish;
+    }
+
+    private BigDecimal normalizeScore(BigDecimal score) {
+        if (score == null) {
+            return BigDecimal.ZERO;
+        }
+        if (score.compareTo(BigDecimal.ZERO) < 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal max = new BigDecimal("5.0");
+        if (score.compareTo(max) > 0) {
+            return max;
+        }
+        return score;
     }
 }

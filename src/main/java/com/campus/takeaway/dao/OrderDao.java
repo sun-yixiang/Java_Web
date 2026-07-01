@@ -107,6 +107,33 @@ public class OrderDao {
         return list;
     }
 
+    public List<Order> findByMerchantId(int merchantId) {
+        String sql = "SELECT o.id, o.order_no, o.user_id, o.address_id, u.real_name user_name, " +
+                "CONCAT(a.receiver_name, ' ', a.phone, ' ', a.detail) address_text, " +
+                "SUM(oi.subtotal) total_amount, o.status, o.remark, o.created_at " +
+                "FROM orders o " +
+                "JOIN users u ON o.user_id = u.id " +
+                "JOIN addresses a ON o.address_id = a.id " +
+                "JOIN order_items oi ON o.id = oi.order_id " +
+                "JOIN dishes d ON oi.dish_id = d.id " +
+                "WHERE d.merchant_id = ? " +
+                "GROUP BY o.id, o.order_no, o.user_id, o.address_id, u.real_name, a.receiver_name, a.phone, a.detail, o.status, o.remark, o.created_at " +
+                "ORDER BY o.id DESC";
+        List<Order> list = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, merchantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapOrder(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+
     public List<OrderItem> findItems(int orderId) {
         String sql = "SELECT * FROM order_items WHERE order_id = ?";
         List<OrderItem> list = new ArrayList<>();
@@ -129,12 +156,51 @@ public class OrderDao {
         return list;
     }
 
+    public List<OrderItem> findItemsByMerchantId(int orderId, int merchantId) {
+        String sql = "SELECT oi.* FROM order_items oi JOIN dishes d ON oi.dish_id = d.id " +
+                "WHERE oi.order_id = ? AND d.merchant_id = ?";
+        List<OrderItem> list = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.setInt(2, merchantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    OrderItem item = new OrderItem();
+                    item.setDishName(rs.getString("dish_name"));
+                    item.setPrice(rs.getBigDecimal("price"));
+                    item.setQuantity(rs.getInt("quantity"));
+                    item.setSubtotal(rs.getBigDecimal("subtotal"));
+                    list.add(item);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+
     public void updateStatus(int id, String status) {
         String sql = "UPDATE orders SET status = ? WHERE id = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateMerchantOrderStatus(int id, int merchantId, String status) {
+        String sql = "UPDATE orders o SET o.status = ? WHERE o.id = ? AND EXISTS (" +
+                "SELECT 1 FROM order_items oi JOIN dishes d ON oi.dish_id = d.id " +
+                "WHERE oi.order_id = o.id AND d.merchant_id = ?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            ps.setInt(3, merchantId);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -1,5 +1,7 @@
 package com.campus.takeaway.model;
 
+import java.math.BigDecimal;
+
 public class Merchant {
     private int id;
     private String name;
@@ -7,6 +9,7 @@ public class Merchant {
     private String phone;
     private String address;
     private String status;
+    private BigDecimal score;
 
     public int getId() {
         return id;
@@ -54,5 +57,13 @@ public class Merchant {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public BigDecimal getScore() {
+        return score;
+    }
+
+    public void setScore(BigDecimal score) {
+        this.score = score;
     }
 }

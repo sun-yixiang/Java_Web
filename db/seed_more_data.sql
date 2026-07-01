@@ -28,6 +28,20 @@ INSERT INTO merchants(name, description, phone, address, status)
 SELECT '深夜拌面局', '拌面、炒面、夜宵小食，晚间供应', '0411-200007', '学生公寓南门', 'open'
 WHERE NOT EXISTS (SELECT 1 FROM merchants WHERE name = '深夜拌面局');
 
+UPDATE merchants SET score = 4.5 WHERE name = '二食堂米饭工坊';
+UPDATE merchants SET score = 4.2 WHERE name = '清晨早餐铺';
+UPDATE merchants SET score = 4.7 WHERE name = '川湘小炒';
+UPDATE merchants SET score = 4.4 WHERE name = '轻食能量站';
+UPDATE merchants SET score = 4.6 WHERE name = '甜品研究所';
+UPDATE merchants SET score = 4.9 WHERE name = '咖啡自习室';
+UPDATE merchants SET score = 4.1 WHERE name = '深夜拌面局';
+
+INSERT INTO users(username, password, real_name, phone, role, merchant_id)
+SELECT m.name, '123456', m.name, m.phone, 'merchant', m.id
+FROM merchants m
+WHERE m.name IN ('二食堂米饭工坊', '清晨早餐铺', '川湘小炒', '轻食能量站', '甜品研究所', '咖啡自习室', '深夜拌面局')
+  AND NOT EXISTS (SELECT 1 FROM users u WHERE u.username = m.name);
+
 INSERT INTO categories(name, description)
 SELECT '套餐', '荤素搭配、米饭套餐、多人组合'
 WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = '套餐');
@@ -156,3 +170,25 @@ INSERT INTO dishes(merchant_id, category_id, name, price, image_url, description
 SELECT m.id, c.id, '炸鸡小食盒', 16.80, '', '鸡块、薯条和蘸酱组合', 70, 'on'
 FROM merchants m JOIN categories c ON c.name = '小吃'
 WHERE m.name = '深夜拌面局' AND NOT EXISTS (SELECT 1 FROM dishes WHERE name = '炸鸡小食盒');
+
+UPDATE dishes SET score = 4.5 WHERE name = '黑椒鸡排饭';
+UPDATE dishes SET score = 4.6 WHERE name = '咖喱牛肉饭';
+UPDATE dishes SET score = 4.3 WHERE name = '鱼香肉丝盖饭';
+UPDATE dishes SET score = 4.2 WHERE name = '鲜肉小笼包';
+UPDATE dishes SET score = 4.1 WHERE name = '皮蛋瘦肉粥';
+UPDATE dishes SET score = 4.0 WHERE name = '鸡蛋灌饼';
+UPDATE dishes SET score = 4.7 WHERE name = '麻婆豆腐饭';
+UPDATE dishes SET score = 4.8 WHERE name = '小炒黄牛肉';
+UPDATE dishes SET score = 4.4 WHERE name = '酸辣土豆丝';
+UPDATE dishes SET score = 4.4 WHERE name = '鸡胸肉藜麦沙拉';
+UPDATE dishes SET score = 4.3 WHERE name = '牛油果全麦卷';
+UPDATE dishes SET score = 4.2 WHERE name = '低脂酸奶碗';
+UPDATE dishes SET score = 4.6 WHERE name = '芒果千层';
+UPDATE dishes SET score = 4.5 WHERE name = '焦糖布丁';
+UPDATE dishes SET score = 4.4 WHERE name = '双皮奶';
+UPDATE dishes SET score = 4.8 WHERE name = '冰美式';
+UPDATE dishes SET score = 4.9 WHERE name = '燕麦拿铁';
+UPDATE dishes SET score = 4.7 WHERE name = '青柠气泡咖啡';
+UPDATE dishes SET score = 4.1 WHERE name = '葱油拌面';
+UPDATE dishes SET score = 4.2 WHERE name = '老干妈炒面';
+UPDATE dishes SET score = 4.3 WHERE name = '炸鸡小食盒';

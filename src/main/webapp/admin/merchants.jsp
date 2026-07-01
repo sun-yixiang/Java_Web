@@ -23,7 +23,7 @@
         <span class="nav-indicator"></span>
         <a href="<%=request.getContextPath()%>/admin/dashboard">首页</a>
         <a class="active" href="<%=request.getContextPath()%>/admin/merchants">商家管理</a>
-        <a href="<%=request.getContextPath()%>/admin/dishes">菜品管理</a>
+        <a href="<%=request.getContextPath()%>/admin/users">用户管理</a>
         <a href="<%=request.getContextPath()%>/admin/orders">订单管理</a>
         <a class="logout-link" href="<%=request.getContextPath()%>/logout">退出</a>
     </div>
@@ -61,6 +61,10 @@
                         <option value="closed" <%=merchant != null && "closed".equals(merchant.getStatus()) ? "selected" : ""%>>已关闭</option>
                     </select>
                 </div>
+                <div>
+                    <label>商家评分</label>
+                    <input name="score" type="number" min="0" max="5" step="0.1" value="<%=merchant == null || merchant.getScore() == null ? "0.0" : merchant.getScore()%>" required>
+                </div>
             </div>
             <p><button class="btn" type="submit">保存商家</button></p>
         </form>
@@ -73,11 +77,12 @@
         </div>
         <div class="admin-table-wrap">
             <table>
-                <tr><th>ID</th><th>名称</th><th>电话</th><th>地址</th><th>状态</th><th>操作</th></tr>
+                <tr><th>ID</th><th>名称</th><th>评分</th><th>电话</th><th>地址</th><th>状态</th><th>操作</th></tr>
                 <% for (Merchant item : merchants) { %>
                 <tr>
                     <td><%=item.getId()%></td>
                     <td><%=item.getName()%></td>
+                    <td><span class="admin-badge admin-score">评分 <%=item.getScore() == null ? "0.0" : item.getScore()%></span></td>
                     <td><%=item.getPhone()%></td>
                     <td><%=item.getAddress()%></td>
                     <td><span class="admin-badge admin-status-<%=item.getStatus()%>"><%=StatusText.merchant(item.getStatus())%></span></td>

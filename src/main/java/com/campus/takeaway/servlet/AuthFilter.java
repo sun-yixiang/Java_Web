@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/cart", "/checkout", "/orders", "/address", "/admin/*"})
+@WebFilter(urlPatterns = {"/cart", "/checkout", "/orders", "/address", "/admin/*", "/merchant-admin/*"})
 public class AuthFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) {
@@ -30,6 +30,11 @@ public class AuthFilter implements Filter {
         }
         if (req.getRequestURI().contains("/admin/") && !"admin".equals(user.getRole())) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "需要管理员权限");
+            return;
+        }
+        if (req.getRequestURI().contains("/merchant-admin/")
+                && (!"merchant".equals(user.getRole()) || user.getMerchantId() == null)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "需要商家权限");
             return;
         }
         chain.doFilter(request, response);

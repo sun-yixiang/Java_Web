@@ -7,6 +7,8 @@ public class User {
     private String realName;
     private String phone;
     private String role;
+    private Integer merchantId;
+    private String merchantName;
 
     public int getId() {
         return id;
@@ -54,5 +56,21 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Integer getMerchantId() {
+        return merchantId;
+    }
+
+    public void setMerchantId(Integer merchantId) {
+        this.merchantId = merchantId;
+    }
+
+    public String getMerchantName() {
+        return merchantName;
+    }
+
+    public void setMerchantName(String merchantName) {
+        this.merchantName = merchantName;
     }
 }

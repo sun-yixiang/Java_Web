@@ -49,6 +49,7 @@ body.admin-page::before {
 }
 
 .admin-nav {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -275,8 +276,16 @@ body.admin-page::before {
     background: linear-gradient(135deg, rgba(52, 211, 153, 0.24), rgba(255, 255, 255, 0.08));
 }
 
+.admin-stat.user {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.20), rgba(255, 255, 255, 0.08));
+}
+
 .admin-stat.order {
     background: linear-gradient(135deg, rgba(250, 204, 21, 0.22), rgba(255, 255, 255, 0.08));
+}
+
+.admin-stats.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .admin-panel {
@@ -362,6 +371,72 @@ body.admin-page::before {
     background: rgba(253, 230, 138, 0.88);
 }
 
+.admin-score {
+    color: #3b2602;
+    background: rgba(253, 230, 138, 0.90);
+}
+
+.admin-role-admin {
+    background: rgba(147, 197, 253, 0.86);
+}
+
+.admin-role-merchant {
+    background: rgba(110, 231, 183, 0.84);
+}
+
+.admin-role-student {
+    background: rgba(255, 255, 255, 0.74);
+}
+
+.admin-alert {
+    margin: 0 0 16px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-alert.error {
+    color: #fecdd3;
+    border-color: rgba(251, 113, 133, 0.32);
+    background: rgba(251, 113, 133, 0.10);
+}
+
+.admin-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.admin-info-grid div {
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.admin-info-grid strong,
+.admin-info-grid span {
+    display: block;
+}
+
+.admin-info-grid strong {
+    color: rgba(226, 246, 255, 0.58);
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.admin-info-grid span {
+    color: #fff;
+    font-weight: 800;
+}
+
+.admin-order-item {
+    margin-bottom: 6px;
+    color: rgba(226, 246, 255, 0.82);
+    white-space: nowrap;
+}
+
 .admin-empty {
     color: rgba(226, 246, 255, 0.62);
 }
@@ -385,7 +460,9 @@ body.admin-page::before {
 
     .admin-hero,
     .admin-stats,
-    .admin-form-grid {
+    .admin-stats.two,
+    .admin-form-grid,
+    .admin-info-grid {
         grid-template-columns: 1fr;
     }
 }
