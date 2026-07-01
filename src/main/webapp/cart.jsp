@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>购物车</title>
     <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/style.css?v=20260626">
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/user.css?v=20260626">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/user.css?v=20260701-img">
 </head>
 <body class="user-page">
 <div class="user-topbar">

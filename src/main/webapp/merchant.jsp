@@ -17,7 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%=merchant.getName()%></title>
     <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/style.css?v=20260626">
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/user.css?v=20260626">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/user.css?v=20260701-img">
 </head>
 <body class="user-page">
 <div class="user-topbar">
@@ -77,7 +77,23 @@
         <% } %>
         <div class="user-grid dish-grid">
             <% for (Dish dish : dishes) { %>
+            <%
+                String imageUrl = dish.getImageUrl();
+                String imageSrc;
+                if (imageUrl == null || imageUrl.trim().isEmpty()) {
+                    imageSrc = request.getContextPath() + "/assets/images/dishes/staple.jpg";
+                } else if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+                    imageSrc = imageUrl;
+                } else if (imageUrl.startsWith("/")) {
+                    imageSrc = request.getContextPath() + imageUrl;
+                } else {
+                    imageSrc = request.getContextPath() + "/" + imageUrl;
+                }
+            %>
             <div class="user-card dish-card <%=dish.getStock() <= 0 ? "is-sold-out" : ""%>">
+                <div class="dish-image-wrap">
+                    <img src="<%=imageSrc%>" alt="<%=dish.getName()%>">
+                </div>
                 <p class="muted"><%=dish.getCategoryName()%></p>
                 <h3><%=dish.getName()%></h3>
                 <p><%=dish.getDescription()%></p>

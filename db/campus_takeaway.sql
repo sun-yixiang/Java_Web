@@ -179,6 +179,16 @@ INSERT INTO dishes(merchant_id, category_id, name, price, image_url, description
 (10, 8, '老干妈炒面', 13.80, '', '微辣咸香，晚间供应稳定', 80, 'on', 4.2),
 (10, 3, '炸鸡小食盒', 16.80, '', '鸡块、薯条和蘸酱组合', 70, 'on', 4.3);
 
+UPDATE dishes SET image_url = 'assets/images/dishes/staple.jpg' WHERE category_id = 1;
+UPDATE dishes SET image_url = 'assets/images/dishes/drink.jpg' WHERE category_id = 2;
+UPDATE dishes SET image_url = 'assets/images/dishes/snack.jpg' WHERE category_id = 3;
+UPDATE dishes SET image_url = 'assets/images/dishes/setmeal.jpg' WHERE category_id = 4;
+UPDATE dishes SET image_url = 'assets/images/dishes/breakfast.jpg' WHERE category_id = 5;
+UPDATE dishes SET image_url = 'assets/images/dishes/dessert.jpg' WHERE category_id = 6;
+UPDATE dishes SET image_url = 'assets/images/dishes/salad.jpg' WHERE category_id = 7;
+UPDATE dishes SET image_url = 'assets/images/dishes/night.jpg' WHERE category_id = 8;
+UPDATE dishes SET image_url = 'assets/images/dishes/coffee.jpg' WHERE category_id = 9;
+
 INSERT INTO addresses(user_id, receiver_name, phone, detail, is_default) VALUES
 (2, '张同学', '13900000000', '3号宿舍楼 502', 1);
 
